@@ -1,0 +1,16 @@
+art==6.5
+click==8.2.1
+iniconfig==2.1.0
+music-tag==0.4.3
+mutagen==1.47.0
+packaging==25.0
+pluggy==1.6.0
+Pygments==2.19.2
+PyTermGUI==7.7.4
+pytest==8.4.1
+PyYAML==6.0.2
+setuptools==80.9.0
+six==1.17.0
+tqdm==4.67.1
+typing_extensions==4.14.0
+wcwidth==0.2.13
