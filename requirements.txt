@@ -1,9 +1,13 @@
 art==6.5
 click==8.2.1
+colorama==0.4.6
+ffmpeg-python==0.2.0
+future==1.0.0
 iniconfig==2.1.0
 music-tag==0.4.3
 mutagen==1.47.0
 packaging==25.0
+pillow==11.3.0
 pluggy==1.6.0
 Pygments==2.19.2
 PyTermGUI==7.7.4
