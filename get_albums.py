@@ -5,6 +5,7 @@ import music_tag
 from tqdm import tqdm
 from art import text2art
 from libpytunes.Library import Library
+import ffmpeg
 
 
 def get_dict_of_tracks(group_by="album", base_path="/home/max/shared/media/music/"):
@@ -31,6 +32,7 @@ def copy_tracklist(songs=[], base_path="/home/max/shared/media/music/"):
         file_path = os.path.join(base_path, song)
         print(f"Copying {line}")
         shutil.copy(file_path, song)
+        ffmpeg.input(song).output(os.path.splitext(song)[0] + ".wav").run()
 
 
 def read_library(file_path="Library.xml"):
