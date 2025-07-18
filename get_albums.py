@@ -23,17 +23,18 @@ def get_dict_of_tracks(group_by="album", base_path="/home/max/shared/media/music
 
 
 def copy_tracklist(songs=[], base_path="/home/max/shared/media/music/"):
-    if songs is []:
+    if songs == []:
         with open("tracklist.txt", "r") as f:
             for line in f.readlines():
                 line = line[:-1]
                 songs.append(line)
+    os.makedirs("burning", exist_ok = True)
     for song in songs:
         file_path = os.path.join(base_path, song)
-        print(f"Copying {line}")
+        print(f"Copying {song} from {file_path}")
         shutil.copy(file_path, song)
-        ffmpeg.input(song).output(os.path.splitext(song)[0] + ".wav").run()
-
+        ffmpeg.input(song).output(os.path.join("./burning", os.path.splitext(song)[0] + ".wav")).run()
+        os.remove(song)
 
 def read_library(file_path="Library.xml"):
     l = Library(file_path)
@@ -82,4 +83,5 @@ def main(write):
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+    copy_tracklist()

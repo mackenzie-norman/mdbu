@@ -1,3 +1,7 @@
 virtualenv
 .venv
 Library.xml
+
+#music files
+*.wav
+*.mp3

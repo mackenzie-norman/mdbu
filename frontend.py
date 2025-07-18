@@ -40,9 +40,12 @@ def selector(songs):
             for l in songs:
                 f.write(l.location.split("/")[-1])
                 f.write("\n")
+        #copy_tracklist([s.name for s in songs])
+        copy_tracklist()
         manager.remove(window)
         for w in old_windows:
             manager.add(w)
+
 
     song_list = ptg.Container()
     for l in songs:
