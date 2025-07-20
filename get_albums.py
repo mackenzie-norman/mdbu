@@ -6,7 +6,7 @@ from tqdm import tqdm
 from art import text2art
 from libpytunes.Library import Library
 import ffmpeg
-
+import subprocess
 
 def get_dict_of_tracks(group_by="album", base_path="/home/max/shared/media/music/"):
     print(f"Scanning {base_path}")
@@ -20,7 +20,10 @@ def get_dict_of_tracks(group_by="album", base_path="/home/max/shared/media/music
         else:
             groups[keyed] = [line]
     return groups
-
+def burn(folder = "burning"):
+    command = ["wodim", "-audio", "-pad", f"{folder}/*.wav"]
+    subprocess.run(command, capture_output=True, text=True)
+    shutil.rmtree(folder)
 
 def copy_tracklist(songs=[], base_path="/home/max/shared/media/music/"):
     if songs == []:
@@ -33,8 +36,10 @@ def copy_tracklist(songs=[], base_path="/home/max/shared/media/music/"):
         file_path = os.path.join(base_path, song)
         print(f"Copying {song} from {file_path}")
         shutil.copy(file_path, song)
-        ffmpeg.input(song).output(os.path.join("./burning", os.path.splitext(song)[0] + ".wav")).run()
+        #wavs need to be 44100 stereo
+        ffmpeg.input(song).output(os.path.join("./burning", os.path.splitext(song)[0] + ".wav"), ac=2, format='wav', ar = 44100 ).run()
         os.remove(song)
+    #burn()
 
 def read_library(file_path="Library.xml"):
     l = Library(file_path)
