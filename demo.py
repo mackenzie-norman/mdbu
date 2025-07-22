@@ -102,7 +102,7 @@ def _define_layout() -> ptg.Layout:
 
     # A slot in the same row as body, using the full non-occupied height and
     # 40% of the terminal's height.
-    layout.add_slot("Body right", width=0.4)
+    layout.add_slot("Body right", width=0.2)
 
     layout.add_break()
 
@@ -142,14 +142,23 @@ def main(argv: list[str] | None = None) -> None:
 
         library = read_library()
 
+        def show_albums(x):
+            albums = library.albums()
+            manager.add(list_picker(albums), assign="body")
+
+        def show_artists(x):
+            artists = library.artists()
+            manager.add(list_picker(artists), assign="body")
+
         def selector(songs, title="Untitled"):
-            global manager
+
             write_tracklist = True
             copy_files = False
 
             old_windows = [w for w in manager]
 
-            window = ptg.Window().set_title(f"[210 bold] {title}").center()
+            # window = ptg.Window().set_title(f"[210 bold] {title}").center()
+            window = ptg.Window()
 
             def flip_var(x):
                 x = not x
@@ -166,27 +175,32 @@ def main(argv: list[str] | None = None) -> None:
 
             song_list = ptg.Container()
             for l in songs:
-                splt = ptg.Splitter(l.name, ptg.Checkbox(True)).set_char(
-                    "seperator", ""
-                )
+                splt = ptg.Splitter(l.name, ptg.Checkbox(lambda *_: 1, True))
                 song_list += splt
                 # song_list += l.name
 
             max_char_len = max([len(song.name) for song in songs])
             window.width = max_char_len * 3
-            layout = ptg.Splitter(song_list, ptg.Container())
-            window += layout
+            # layout = ptg.Splitter(song_list, ptg.Container())
+            # window += layout
+            window += song_list
             window += ptg.Splitter(
                 ptg.Button("Burn to CD", lambda x: flip_var(copy_files)),
                 ptg.Button("Back", show_albums),
             )
-            manager.add(window)
+            manager.add(window, assign="body")
 
         def list_picker(options, max_size=10, current_idx=0):
             return_win = ptg.Window()
             splitter = ptg.Splitter()
             i = 0
-            for l in list(options.keys()):
+            key_vals = list(options.keys())
+            key_vals = (
+                key_vals[current_idx % len(key_vals) :]
+                + key_vals[current_idx % len(key_vals) :]
+            )
+
+            for l in key_vals:
                 i += 1
                 if i <= max_size:
                     return_win += [
@@ -194,21 +208,22 @@ def main(argv: list[str] | None = None) -> None:
                         lambda x: selector(options[x.label], x.label),
                     ]
 
-            if i > max_size:
-                return_win += ptg.Splitter(
-                    ptg.Button(
-                        "Back",
-                        lambda *_: list_picker(
-                            options, max_size, current_idx - max_size
-                        ),
+            return_win += ptg.Splitter(
+                ptg.Button(
+                    "Back",
+                    lambda *_: manager.add(
+                        list_picker(options, max_size, current_idx - max_size),
+                        assign="body",
                     ),
-                    ptg.Button(
-                        "Next",
-                        lambda *_: list_picker(
-                            options, max_size, current_idx + max_size
-                        ),
+                ),
+                ptg.Button(
+                    "Next",
+                    lambda *_: manager.add(
+                        list_picker(options, max_size, current_idx + max_size),
+                        assign="body",
                     ),
-                )
+                ),
+            )
             # return_win += splitter
 
             return return_win
@@ -226,7 +241,7 @@ def main(argv: list[str] | None = None) -> None:
         manager.add(header)
 
         footer = ptg.Window(
-            ptg.Button("Back", lambda *_: _confirm_quit(manager)),
+            ptg.Button("Quit", lambda *_: _confirm_quit(manager)),
         )
         footer.styles.fill = "app.footer"
 
@@ -237,8 +252,8 @@ def main(argv: list[str] | None = None) -> None:
         manager.add(
             ptg.Window(
                 "",
-                ["Albums"],
-                ["Artists"],
+                ["Albums", show_albums],
+                ["Artists", show_artists],
                 [
                     "Playlists",
                 ],
