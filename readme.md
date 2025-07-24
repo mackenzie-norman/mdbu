@@ -1,6 +1,8 @@
 # Max's Disc Burning Utility
 
 this tool currently utilizes iTunes library exports to allow you to burn songs/playlists/albums from your itunes library to a cd from the command line. I needed this interface because my only computer with a cd burner is a headless linux box. 
+<img width="2839" height="1603" alt="Screenshot 2025-07-23 113305" src="https://github.com/user-attachments/assets/9ca62a16-7bf3-4524-97d8-213f2ba13b43" />
+
 # TODO
 before I add more functionality I need to upstream and figure out the (libpytunes)[https://github.com/liamks/libpytunes] and see if they will accept my PR. 
 
