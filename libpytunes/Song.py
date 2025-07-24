@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass(eq=True, kw_only=True)
 class Song:
     name: str = None
@@ -55,4 +56,12 @@ class Song:
     release_date: str = None  # (Time)
 
     def __repr__(self):
-        return f'Song(name={self.name!r}, artist={self.artist!r}, track_id={self.track_id!r})'
+        return f"Song(name={self.name!r}, artist={self.artist!r}, track_id={self.track_id!r})"
+
+    def __eq__(self, other):
+        if not isinstance(other, Song):
+            return NotImplemented
+        return self.name == other.name and self.track_id == other.track_id
+
+    def __hash__(self):
+        return hash(self.name)

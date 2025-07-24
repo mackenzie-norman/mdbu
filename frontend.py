@@ -30,7 +30,7 @@ with ptg.WindowManager() as manager:
         global manager
         write_tracklist = True
         copy_files = False
-
+        songs_to_write = {s.name: True for s in songs}
         old_windows = [w for w in manager]
 
         window = ptg.Window().set_title(f"[210 bold] {title}").center()

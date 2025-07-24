@@ -130,6 +130,24 @@ def _confirm_quit(manager: ptg.WindowManager) -> None:
     manager.add(modal)
 
 
+def _confirm_burn(manager: ptg.WindowManager, song_count: int, burn_fn) -> None:
+    """Creates an "Are you sure you want to quit" modal window"""
+
+    modal = ptg.Window(
+        f"[app.title]Are you sure you want to burn {song_count} songs? ",
+        "",
+        ptg.Container(
+            ptg.Splitter(
+                ptg.Button("Yes", lambda *_: burn_fn()),
+                ptg.Button("No", lambda *_: modal.close()),
+            ),
+        ),
+    ).center()
+
+    modal.select(1)
+    manager.add(modal)
+
+
 def main(argv: list[str] | None = None) -> None:
     """Runs the application."""
 
@@ -150,6 +168,12 @@ def main(argv: list[str] | None = None) -> None:
             artists = library.artists()
             manager.add(list_picker(artists), assign="body")
 
+        def show_playlists(x):
+            playlists = {
+                p: library.getPlaylist(p).tracks for p in library.getPlaylistNames()
+            }
+            manager.add(list_picker(playlists), assign="body")
+
         def selector(songs, title="Untitled"):
 
             write_tracklist = True
@@ -159,23 +183,26 @@ def main(argv: list[str] | None = None) -> None:
 
             # window = ptg.Window().set_title(f"[210 bold] {title}").center()
             window = ptg.Window()
+            songs_to_write = {s: True for s in songs}
 
-            def flip_var(x):
-                x = not x
-                print(f"Writing {len(songs)} songs to tracklist.txt")
+            def set_song(song_name, value):
+                songs_to_write[song_name] = value
+
+            def write_and_burn():
                 with open("tracklist.txt", "w") as f:
-                    for l in songs:
-                        f.write(l.location.split("/")[-1])
-                        f.write("\n")
+                    for l in songs_to_write:
+                        if songs_to_write[l]:
+                            f.write(l.location.split("/")[-1])
+                            f.write("\n")
                 # copy_tracklist([s.name for s in songs])
                 copy_tracklist()
-                manager.remove(window)
-                for w in old_windows:
-                    manager.add(w)
 
             song_list = ptg.Container()
             for l in songs:
-                splt = ptg.Splitter(l.name, ptg.Checkbox(lambda *_: 1, True))
+                splt = ptg.Splitter(
+                    l.name,
+                    ptg.Checkbox(lambda x: set_song(l, x), True),
+                )
                 song_list += splt
                 # song_list += l.name
 
@@ -185,7 +212,14 @@ def main(argv: list[str] | None = None) -> None:
             # window += layout
             window += song_list
             window += ptg.Splitter(
-                ptg.Button("Burn to CD", lambda x: flip_var(copy_files)),
+                ptg.Button(
+                    "Burn to CD",
+                    lambda x: _confirm_burn(
+                        manager,
+                        len([s for s in songs_to_write if songs_to_write[s]]),
+                        write_and_burn,
+                    ),
+                ),
                 ptg.Button("Back", show_albums),
             )
             manager.add(window, assign="body")
@@ -254,9 +288,7 @@ def main(argv: list[str] | None = None) -> None:
                 "",
                 ["Albums", show_albums],
                 ["Artists", show_artists],
-                [
-                    "Playlists",
-                ],
+                ["Playlists", show_playlists],
             ),
             assign="body_right",
         )
