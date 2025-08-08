@@ -28,8 +28,8 @@ class Song:
     rating: int = None
     rating_computed: bool = False
     album_rating: int = None
-    play_count: int = None
-    skip_count: int = None
+    play_count: int = 0
+    skip_count: int = 0
     skip_date: str = None  # (Time)
     location: str = None
     location_escaped: str = None
